@@ -1,52 +1,55 @@
-# locadex
+# Locadex
 
-Locadex is a standalone C99 spatial-indexing library for deterministic grid coordinates, neighborhoods, Morton-style mappings and bounded spatial transforms.
+Grid, voxel, Morton and bounded spatial-index calculations.
 
-## Scope
+## Overview
+**Spatial indexing.** Grid, voxel, Morton and bounded spatial-index calculations.
 
-The package contains 17 public headers and 5 implementation units. It is portable C99, uses no mandatory heap or operating-system service, and keeps caller-owned state explicit where applicable.
+## Engineering problem
+Spatial firmware needs compact coordinate/index transforms with explicit integer bounds.
 
-## Build and test
+## Features
+- Portable C99-oriented implementation.
+- Deterministic integer or fixed-point behavior documented at function level.
+- No mandatory heap, threads or operating-system services.
+- Separate translation units for selective linking.
 
+## Architecture
+The public surface consists of 5 headers and 5 callable API entries under include/. Implementations are in src/ and tests are in tests/. State, buffers and output ownership are explicit in each header contract.
+
+## Public API
+The complete symbol-by-symbol reference is in docs/API_REFERENCE.md. It lists every public header, callable symbol, include path and available contract comment.
+
+## Integration
 ```sh
 cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON
-cmake --build build --config Release
-ctest --test-dir build --output-on-failure -C Release
+cmake --build build --parallel
+ctest --test-dir build --output-on-failure
 ```
 
-## Validation status
+For minimal firmware, include only the required header and compile the corresponding source translation unit. No collection-wide dependency is required.
 
-Host validation is run during extraction. ESP32-S3 validation and isolated footprint measurements are pending unless explicitly recorded; no hardware result is claimed.
+## Configuration and dependencies
+The CMake test option is LOCADEX_BUILD_TESTS. The library has no mandatory third-party dependency. Platform-specific link requirements are documented in CMake and the affected API header.
 
-## Architecture and integration
+## Numeric and safety contracts
+Read the individual public header before use. It defines widths, representation, valid ranges, rounding, overflow/saturation/wrap behavior, invalid-input handling and whether output is left unchanged on failure. APIs are stateless unless a caller-owned state object is explicitly present.
 
-Coordinate, grid and Morton operations are isolated C99 translation units with
-fixed-width data and explicit outputs. Link `locadex` through CMake or compile
-selected files from `src/` with headers from `include/`.
+## Testing and validation
+2/2 enabled host tests passed.
+See docs/TESTING.md for reproducible commands, coverage boundaries and hardware status.
 
-## API, configuration and dependencies
+## Resource status
+Embedded flash, RAM, stack and cycle measurements are reported only when measured for this product and configuration. Unmeasured values are marked PENDING; host measurements are not MCU measurements.
 
-Public headers are under `include/locadex/spatial`. `LOCADEX_BUILD_TESTS`
-controls host tests. No heap, OS, thread or third-party dependency is required;
-coordinate bounds and invalid-input behavior are specified in each header.
+## Hardware status
+Hardware validation is reported in docs/TESTING.md. HW NOT VERIFIED is used where no reproducible target run is available.
 
-## Resource, performance and limitations
+## Limitations
+Preserved tests outside this product boundary are not silently treated as product coverage. Unsupported ranges and invalid inputs are defined by the public headers.
 
-The enabled host suite passes 2/2 tests. Embedded flash, RAM, stack and cycle
-measurements are `PENDING`; HW NOT VERIFIED. Do not use coordinate encodings as
-security mechanisms.
+## Versioning and license
+Version 0.1.0. Public API compatibility is maintained within the 0.x series as documented changes are introduced. Apache License 2.0, copyright Vanderhell; see LICENSE and NOTICE.
 
-## Version, license and origin
-
-The product is independently versioned with semantic-versioning intent before
-1.0. Apache License 2.0, copyright Vanderhell. It is self-contained and was
-maintained as a self-contained library.
-
-## Name and origin
-
-Locadex combines locus (place) with index, reflecting compact deterministic coordinate and grid indexing.
-Its technical scope is spatial indexing, grids and coordinate transforms.
-
-## License
-
-Apache License 2.0, copyright Vanderhell. See LICENSE and NOTICE.
+## Origin
+This repository is a self-contained product library. Historical provenance is maintained in the central catalog, while this repository documents the usable public API and its behavior.
