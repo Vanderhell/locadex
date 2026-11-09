@@ -1,4 +1,4 @@
-#include <primitivecore/geometry/predicates/containment/pc_grid_direction8_i32.h>
+#include "pc_grid_direction8_i32.h"
 #include <stddef.h>
 
 static uint32_t magnitude(int32_t value)

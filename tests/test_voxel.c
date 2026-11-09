@@ -1,5 +1,5 @@
-#include "../include/pc_voxel_coords_3d_u32.h"
-#include "../../0511_rm_voxel_index_3d_u32/implementation/pc_voxel_index_3d_u32.h"
+#include "pc_voxel_coords_3d_u32.h"
+#include "pc_voxel_index_3d_u32.h"
 
 #include <assert.h>
 #include <stdint.h>

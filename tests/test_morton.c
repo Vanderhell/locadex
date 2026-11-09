@@ -1,5 +1,5 @@
-#include "../include/pc_morton3_decode_u32.h"
-#include "../../0513_rm_morton3_encode_u32/implementation/pc_morton3_encode_u32.h"
+#include "pc_morton3_decode_u32.h"
+#include "pc_morton3_encode_u32.h"
 
 #include <assert.h>
 #include <stdint.h>

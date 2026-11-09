@@ -1,4 +1,4 @@
-#include <primitivecore/spatial/indexing/morton/pc_morton3_encode_u32.h>
+#include "pc_morton3_encode_u32.h"
 
 #include <stddef.h>
 

@@ -1,4 +1,4 @@
-#include <primitivecore/spatial/indexing/grids/pc_voxel_coords_3d_u32.h>
+#include "pc_voxel_coords_3d_u32.h"
 
 #include <stddef.h>
 
