@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.20)
+project(locadex VERSION 0.1.0 LANGUAGES C)
+option(LOCADEX_BUILD_TESTS 'Build migrated tests' ON)
+file(GLOB LOCADEX_SOURCES CONFIGURE_DEPENDS src/*.c)
+add_library(locadex STATIC ${LOCADEX_SOURCES})
+target_include_directories(locadex PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/locadex/spatial)
+target_compile_features(
+locadex
+ PUBLIC c_std_99)
+if(LOCADEX_BUILD_TESTS)
+ enable_testing()
+ file(GLOB LOCADEX_TESTS CONFIGURE_DEPENDS tests/*.c)
+ foreach(test_source IN LISTS 
+LOCADEX
+_TESTS)
+  get_filename_component(test_name "${test_source}" NAME_WE)
+  add_executable(locadex_${test_name} ${test_source})
+  target_include_directories(locadex_${test_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/locadex/spatial)
+  target_link_libraries(
+locadex
+_${test_name} PRIVATE 
+locadex
+)
+  add_test(NAME "${test_name}" COMMAND "locadex_${test_name}")
+ endforeach()
+endif()
