@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-bool rm_voxel_coords_3d_u32(uint32_t width, uint32_t height, uint32_t depth,
+bool pc_voxel_coords_3d_u32(uint32_t width, uint32_t height, uint32_t depth,
                            uint32_t index, uint32_t *x, uint32_t *y,
                            uint32_t *z)
 {

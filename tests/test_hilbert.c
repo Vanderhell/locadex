@@ -1,5 +1,5 @@
 #include "../include/pc_hilbert2_coords_u32.h"
-#include "../../0515_rm_hilbert2_index_u32/implementation/pc_hilbert2_index_u32.h"
+#include "../../0515_pc_hilbert2_index_u32/implementation/pc_hilbert2_index_u32.h"
 
 #include <assert.h>
 #include <stdint.h>

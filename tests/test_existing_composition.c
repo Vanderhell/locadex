@@ -1,4 +1,4 @@
-#include "roundmath/control_output_clamp_i32.h"
+/* Held-out cross-family validation source; dependency is outside this product. */
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>

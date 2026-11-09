@@ -1,5 +1,5 @@
 #include "../include/pc_grid_spiral_coords_i32.h"
-#include "../../0509_rm_grid_spiral_index_u32/implementation/pc_grid_spiral_index_u32.h"
+#include "../../0509_pc_grid_spiral_index_u32/implementation/pc_grid_spiral_index_u32.h"
 
 #include <assert.h>
 #include <stdint.h>

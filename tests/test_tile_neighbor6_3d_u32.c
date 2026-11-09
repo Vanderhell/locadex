@@ -1,4 +1,4 @@
-#include "roundmath/tile_neighbor6_3d_u32.h"
+/* Held-out cross-family validation source; dependency is outside this product. */
 
 #include <assert.h>
 #include <stdint.h>
