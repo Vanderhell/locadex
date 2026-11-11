@@ -1,4 +1,4 @@
-﻿# Locadex
+# Locadex
 ![CI](https://github.com/Vanderhell/locadex/actions/workflows/ci.yml/badge.svg) ![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg) ![Language](https://img.shields.io/badge/language-C99-informational.svg)
 
 ![Locadex banner](docs/banner.svg)
@@ -44,7 +44,7 @@ The CMake test option is LOCADEX_BUILD_TESTS. The library has no mandatory third
 
 ## Validation status
 
-2/2 enabled host tests passed.
+3/3 enabled tests pass in the recorded GCC, Clang and MSVC Debug/Release configurations. The ESP32-S3 validation result and limits are recorded in docs/TESTING.md.
 See docs/TESTING.md for reproducible commands, coverage boundaries and hardware status.
 
 Detailed overflow, rounding, invalid-input, memory-ownership and state rules are defined by the public headers and API reference. Do not infer them from the product name alone.

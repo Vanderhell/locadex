@@ -1,6 +1,9 @@
 #include "pc_voxel_coords_3d_u32.h"
 #include "pc_voxel_index_3d_u32.h"
 
+#ifdef NDEBUG
+#undef NDEBUG /* Assertions are required checks in Release tests as well. */
+#endif
 #include <assert.h>
 #include <stdint.h>
 

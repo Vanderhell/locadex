@@ -3,10 +3,39 @@ on:
   push:
   pull_request:
 jobs:
-  host:
+  gcc-clang:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+        build_type: [Debug, Release]
+    env:
+      CC: ${{ matrix.compiler }}
     steps:
       - uses: actions/checkout@v4
-      - run: cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON
+      - run: cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON -DLOCADEX_STRICT_WARNINGS=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      - run: cmake --build build --parallel
+      - run: ctest --test-dir build --output-on-failure -C ${{ matrix.build_type }}
+  gcc-sanitizers:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, undefined]
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON -DLOCADEX_STRICT_WARNINGS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS='-fsanitize=${{ matrix.sanitizer }} -fno-omit-frame-pointer -fno-sanitize-recover=all'
       - run: cmake --build build --parallel
       - run: ctest --test-dir build --output-on-failure
+  msvc:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON -DLOCADEX_STRICT_WARNINGS=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      - run: cmake --build build --config ${{ matrix.build_type }} --parallel
+      - run: ctest --test-dir build --output-on-failure -C ${{ matrix.build_type }}
