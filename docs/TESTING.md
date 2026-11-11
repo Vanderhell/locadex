@@ -20,7 +20,7 @@ Each API receives at least 100,000 fixed-seed generated cases: direction full-ra
 | MSVC 19.42.34444, `/W4 /WX`, Release | PASS, 3/3 |
 | GCC AddressSanitizer | PASS, 3/3 |
 | GCC UndefinedBehaviorSanitizer | PASS, 3/3 |
-| GitHub Actions | NOT RUN until push |
+| GitHub Actions for audit commit `8a44289` | PASS, all 8 jobs ([run 42978119057](https://github.com/Vanderhell/locadex/actions/runs/42978119057)) |
 
 Reproduce host tests with:
 
