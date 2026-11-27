@@ -1,53 +1,72 @@
 # Locadex
+
 ![CI](https://github.com/Vanderhell/locadex/actions/workflows/ci.yml/badge.svg) ![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg) ![Language](https://img.shields.io/badge/language-C99-informational.svg)
 
 ![Locadex banner](docs/banner.svg)
 
-Grid, voxel, Morton and bounded spatial-index calculations.
+Locadex is a portable C99 library for bounded grid, voxel and three-dimensional spatial-index calculations. Its five operations cover compass-direction quantization, 3D Morton encoding/decoding and checked row-major voxel indexing.
 
-## Why it exists
+## Functional groups
 
-Spatial firmware needs compact coordinate/index transforms with explicit integer bounds.
+- **Grid direction:** map an integer displacement to the nearest of eight compass sectors.
+- **Morton codes:** interleave/deinterleave three 10-bit coordinates.
+- **Voxel indexing:** convert between bounded coordinates and a checked linear index.
 
-## What is included
+## Engineering properties
 
-- Portable C99-oriented implementation.
-- Deterministic integer or fixed-point behavior documented at function level.
-- No mandatory heap, threads or operating-system services.
-- Separate translation units for selective linking.
+- Deterministic integer operations with explicit fixed-width inputs and outputs.
+- No mandatory heap allocation, operating-system service, thread or third-party dependency.
+- One C implementation unit per callable operation for selective linking.
+- CMake tests and examples are opt-in when consumed as a dependency.
 
 ## Quick start
 
-```sh
-cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON
-cmake --build build --parallel
-ctest --test-dir build --output-on-failure
+```c
+#include <locadex/spatial/morton3_encode_u32.h>
+#include <stdint.h>
+
+int main(void)
+{
+    uint32_t code = 0u;
+    if (!locadex_morton3_encode_u32(1u, 2u, 3u, &code)) {
+        return 1;
+    }
+    return code == 53u ? 0 : 1;
+}
 ```
 
-For a minimal integration, include only the required public header and compile the matching source unit.
+## Build and test
+
+```sh
+cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON -DLOCADEX_STRICT_WARNINGS=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+ctest --test-dir build --output-on-failure -C Release
+```
+
+## Integration
+
+Installed package:
+
+```cmake
+find_package(Locadex CONFIG REQUIRED)
+target_link_libraries(firmware PRIVATE Locadex::Locadex)
+```
+
+`add_subdirectory()` is also supported. For direct source integration, include the desired header under `<locadex/spatial/>` and compile its matching `src/locadex_<operation>.c` unit.
+
+## Validation
+
+All five APIs have direct enabled host tests. Deterministic differential tests include at least 100,000 cases per API plus boundary and small-domain exhaustive checks. Compiler, sanitizer, hardware and measurement evidence is recorded in [TESTING.md](docs/TESTING.md), [AUDIT.md](docs/AUDIT.md) and [PERFORMANCE.md](docs/PERFORMANCE.md). Historical ESP32-S3 evidence is separated from current-revision verification.
 
 ## Documentation
 
 | Need | Read |
 |---|---|
-| Choose a primitive | [Family guide](docs/FAMILY_GUIDE.md) |
-| Check every function and contract | [API reference](docs/API_REFERENCE.md) |
-| Reproduce tests and see validation limits | [Testing report](docs/TESTING.md) |
-| Review design and dependencies | [Architecture](docs/ARCHITECTURE.md) |
-| See measured or pending performance data | [Performance](docs/PERFORMANCE.md) |
-
-## At a glance
-
-The public surface consists of 5 headers and 5 callable API entries under include/. Implementations are in src/ and tests are in tests/. State, buffers and output ownership are explicit in each header contract.
-
-The CMake test option is LOCADEX_BUILD_TESTS. The library has no mandatory third-party dependency. Platform-specific link requirements are documented in CMake and the affected API header.
-
-## Validation status
-
-3/3 enabled tests pass in the recorded GCC, Clang and MSVC Debug/Release configurations. The ESP32-S3 validation result and limits are recorded in docs/TESTING.md.
-See docs/TESTING.md for reproducible commands, coverage boundaries and hardware status.
-
-Detailed overflow, rounding, invalid-input, memory-ownership and state rules are defined by the public headers and API reference. Do not infer them from the product name alone.
+| Choose a spatial operation | [Family guide](docs/FAMILY_GUIDE.md) |
+| Review each API contract | [API reference](docs/API_REFERENCE.md) |
+| Reproduce validation | [Testing](docs/TESTING.md) |
+| Review design | [Architecture](docs/ARCHITECTURE.md) |
+| Review embedded measurements | [Performance](docs/PERFORMANCE.md) |
 
 ## License
 

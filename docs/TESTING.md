@@ -1,37 +1,60 @@
 # Testing and validation
 
-## Automated coverage
+## Coverage
 
-CTest registers three executables: preserved Morton and voxel contract tests plus `test_api_audit.c`. The audit test uses explicit `CHECK` conditions, not `assert`, and is active in Release. Independent references are a bit-at-a-time Morton model, `atan2`/`floor` direction quantization, and widened formula/quotient-remainder voxel models.
+All five public functions have direct enabled tests. CTest registers three
+behavior programs (`test_api_audit`, `test_morton`, `test_voxel`), five
+independent C public-header builds and one C++ aggregate-header/link smoke
+test: nine entries total. Test checks remain active in Release; the API audit
+uses explicit `CHECK` conditions; the two retained assertion-based test
+sources undefine `NDEBUG` themselves.
 
-Coverage includes all 8 direction codes, vectors on both sides of each angular boundary, zero/null/failure output preservation, `INT32_MIN`/`INT32_MAX`, every pair of aliased coordinate outputs, Morton coordinate edges 0/1/2/511/512/1022/1023, high-bit rejection, round trips, exhaustive small voxel grids, 2^32-cell maximum legal capacity, invalid dimensions/coordinates/indexes, and volume overflow.
+The API audit executes at least 100,000 deterministic cases for every
+operation. Its references use per-bit Morton placement/extraction,
+`atan2`/`floor` direction quantization and independently expressed widened
+row-major/quotient-remainder voxel formulas. It also includes boundary tests,
+round trips, output preservation, alias rejection and exhaustive small-grid
+checks. These finite tests do not enumerate the full integer domains.
 
-Each API receives at least 100,000 fixed-seed generated cases: direction full-range vectors; Morton encode triples and decode codes; voxel index valid shapes/coordinates; voxel coords varied valid shapes and maximum-volume indices. Some operations receive additional generated or exhaustive-small-domain checks. Full input-space enumeration is not feasible for the 30-bit Morton and 32-bit voxel domains.
+## Reproduce
 
-## Host results
+```sh
+cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON -DLOCADEX_STRICT_WARNINGS=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build build --parallel
+ctest --test-dir build --output-on-failure
+
+cmake -S . -B build-release -DLOCADEX_BUILD_TESTS=ON -DLOCADEX_STRICT_WARNINGS=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build-release --parallel
+ctest --test-dir build-release --output-on-failure
+```
+
+GitHub Actions runs GCC and Clang in Debug and Release, separate GCC ASan and
+UBSan jobs, and MSVC Debug and Release. Current-commit remote results must be
+checked after push.
+
+## Current local results
+
+Executed on 2026-11-28 against the namespaced tree with strict warnings:
 
 | Toolchain/configuration | Result |
 |---|---|
-| GCC 13.3.0, C99 strict warnings, Debug | PASS, 3/3 |
-| GCC 13.3.0, C99 strict warnings, Release | PASS, 3/3 |
-| Clang 18.1.3, C99 strict warnings, Debug | PASS, 3/3 |
-| Clang 18.1.3, C99 strict warnings, Release | PASS, 3/3 |
-| MSVC 19.42.34444, `/W4 /WX`, Debug | PASS, 3/3 |
-| MSVC 19.42.34444, `/W4 /WX`, Release | PASS, 3/3 |
-| GCC AddressSanitizer | PASS, 3/3 |
-| GCC UndefinedBehaviorSanitizer | PASS, 3/3 |
-| GitHub Actions for audit commit `8a44289` | PASS, all 8 jobs ([run 42978119057](https://github.com/Vanderhell/locadex/actions/runs/42978119057)) |
+| GCC 16.1.0 MinGW UCRT Debug | PASS, 9/9 |
+| GCC 16.1.0 MinGW UCRT Release | PASS, 9/9 |
+| MSVC 19.42.34444 Debug | PASS, 9/9 |
+| MSVC 19.42.34444 Release | PASS, 9/9 |
+| ClangCL 19.1.5 Debug | PASS, 9/9 |
+| ClangCL 19.1.5 Release | PASS, 9/9 |
+| Linux GCC/Clang, ASan and UBSan on this revision | Pending remote CI |
 
-Reproduce host tests with:
+Earlier CI run `42978119057` passed eight jobs for the pre-productization
+revision. It is historical and does not substitute for the current commit's
+workflow.
 
-```sh
-cmake -S . -B build -DLOCADEX_BUILD_TESTS=ON -DLOCADEX_STRICT_WARNINGS=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build build --parallel
-ctest --test-dir build --output-on-failure -C Release
-```
+## ESP32-S3
 
-Sanitizer configurations use GCC with `-fsanitize=address` or `-fsanitize=undefined -fno-sanitize-recover=all`, plus `-fno-omit-frame-pointer`.
-
-## Hardware
-
-ESP32-S3 v0.2 test on the Ozobot DRVKit profile (Arduino ESP32 core 3.3.10, 240 MHz): all five APIs passed the independent expected-value checks and the firmware emitted `LOCADEX_ALL5_PASS`. Per-operation cycle readings, build footprint and their limits are in `PERFORMANCE.md`.
+Historical ESP32-S3 firmware called all five pre-namespace functions, checked
+independent expected values and emitted `LOCADEX_ALL5_PASS`. The normalized
+implementation comparison found that namespacing changed no algorithm body.
+No new current-revision firmware was flashed or executed. Current hardware
+status is **HW NOT VERIFIED**. Historical cycle and size measurements are
+summarized in [PERFORMANCE.md](PERFORMANCE.md).

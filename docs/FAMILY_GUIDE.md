@@ -24,11 +24,11 @@ flowchart LR
 
 | Public header | Symbol | Purpose and contract | Validation source |
 |---|---|---|---|
-| `include/locadex/spatial/pc_grid_direction8_i32.h` | `pc_grid_direction8_i32` | Quantize a signed int32 displacement to its nearest compass direction. Codes are E, NE, N, NW, W, SW, S, SE = 0..7 counterclockwise. The zero vector fails; failure preserves *out. | tests/test_api_audit.c and focused boundary tests |
-| `include/locadex/spatial/pc_morton3_decode_u32.h` | `pc_morton3_decode_u32` | Decode a 30-bit x/y/z-interleaved Morton code. Codes with either upper uint32 bit set are invalid. Outputs must be non-null and distinct; failure preserves all outputs. | tests/test_morton.c |
-| `include/locadex/spatial/pc_morton3_encode_u32.h` | `pc_morton3_encode_u32` | Interleave three 10-bit coordinates into bits 0..29 in x,y,z order. Failure preserves code. | tests/test_morton.c |
-| `include/locadex/spatial/pc_voxel_coords_3d_u32.h` | `pc_voxel_coords_3d_u32` | Checked inverse of pc_voxel_index_3d_u32. Dimensions are nonzero, volume <= UINT32_MAX+1, and output pointers are non-null and distinct. Failure preserves all outputs. | tests/test_voxel.c |
-| `include/locadex/spatial/pc_voxel_index_3d_u32.h` | `pc_voxel_index_3d_u32` | Checked row-major voxel index ((z * height + y) * width + x). Dimensions must be nonzero, coordinates in range, and volume <= UINT32_MAX+1 cells. Failure preserves index. | tests/test_voxel.c |
+| `include/locadex/spatial/grid_direction8_i32.h` | `locadex_grid_direction8_i32` | Quantize a signed int32 displacement to its nearest compass direction. Codes are E, NE, N, NW, W, SW, S, SE = 0..7 counterclockwise. The zero vector fails; failure preserves *out. | tests/test_api_audit.c and focused boundary tests |
+| `include/locadex/spatial/morton3_decode_u32.h` | `locadex_morton3_decode_u32` | Decode a 30-bit x/y/z-interleaved Morton code. Codes with either upper uint32 bit set are invalid. Outputs must be non-null and distinct; failure preserves all outputs. | tests/test_morton.c |
+| `include/locadex/spatial/morton3_encode_u32.h` | `locadex_morton3_encode_u32` | Interleave three 10-bit coordinates into bits 0..29 in x,y,z order. Failure preserves code. | tests/test_morton.c |
+| `include/locadex/spatial/voxel_coords_3d_u32.h` | `locadex_voxel_coords_3d_u32` | Checked inverse of locadex_voxel_index_3d_u32. Dimensions are nonzero, volume <= UINT32_MAX+1, and output pointers are non-null and distinct. Failure preserves all outputs. | tests/test_voxel.c |
+| `include/locadex/spatial/voxel_index_3d_u32.h` | `locadex_voxel_index_3d_u32` | Checked row-major voxel index ((z * height + y) * width + x). Dimensions must be nonzero, coordinates in range, and volume <= UINT32_MAX+1 cells. Failure preserves index. | tests/test_voxel.c |
 
 ## Selection guidance
 

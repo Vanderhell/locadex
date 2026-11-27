@@ -1,4 +1,4 @@
-#include "pc_grid_direction8_i32.h"
+#include <locadex/spatial/grid_direction8_i32.h>
 #include <stddef.h>
 
 static uint32_t magnitude(int32_t value)
@@ -7,7 +7,7 @@ static uint32_t magnitude(int32_t value)
     return value < 0 ? 0u - bits : bits;
 }
 
-bool pc_grid_direction8_i32(int32_t dx, int32_t dy, uint8_t *out)
+bool locadex_grid_direction8_i32(int32_t dx, int32_t dy, uint8_t *out)
 {
     const uint32_t ax = magnitude(dx), ay = magnitude(dy);
     const bool x_major = ax >= ay;

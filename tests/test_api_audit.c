@@ -3,11 +3,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "pc_grid_direction8_i32.h"
-#include "pc_morton3_decode_u32.h"
-#include "pc_morton3_encode_u32.h"
-#include "pc_voxel_coords_3d_u32.h"
-#include "pc_voxel_index_3d_u32.h"
+#include <locadex/spatial/grid_direction8_i32.h>
+#include <locadex/spatial/morton3_decode_u32.h>
+#include <locadex/spatial/morton3_encode_u32.h>
+#include <locadex/spatial/voxel_coords_3d_u32.h>
+#include <locadex/spatial/voxel_index_3d_u32.h>
 
 #define CHECK(expr) do { if (!(expr)) { \
     fprintf(stderr, "FAIL %s:%d: %s\n", __FILE__, __LINE__, #expr); \
@@ -87,29 +87,29 @@ static int test_morton(void)
         for (b = 0u; b < sizeof edge / sizeof edge[0]; ++b)
             for (c = 0u; c < sizeof edge / sizeof edge[0]; ++c) {
                 expected = morton_reference(edge[a], edge[b], edge[c]);
-                CHECK(pc_morton3_encode_u32(edge[a], edge[b], edge[c], &actual));
+                CHECK(locadex_morton3_encode_u32(edge[a], edge[b], edge[c], &actual));
                 CHECK(actual == expected);
-                CHECK(pc_morton3_decode_u32(expected, &x, &y, &z));
+                CHECK(locadex_morton3_decode_u32(expected, &x, &y, &z));
                 CHECK(x == edge[a] && y == edge[b] && z == edge[c]);
             }
     for (i = 0u; i < 10u; ++i) {
         const uint32_t bit = UINT32_C(1) << i;
-        CHECK(pc_morton3_encode_u32(bit, 0u, 0u, &code));
+        CHECK(locadex_morton3_encode_u32(bit, 0u, 0u, &code));
         CHECK(code == (UINT32_C(1) << (3u * i)));
-        CHECK(pc_morton3_encode_u32(0u, bit, 0u, &code));
+        CHECK(locadex_morton3_encode_u32(0u, bit, 0u, &code));
         CHECK(code == (UINT32_C(1) << (3u * i + 1u)));
-        CHECK(pc_morton3_encode_u32(0u, 0u, bit, &code));
+        CHECK(locadex_morton3_encode_u32(0u, 0u, bit, &code));
         CHECK(code == (UINT32_C(1) << (3u * i + 2u)));
     }
-    CHECK(pc_morton3_encode_u32(1023u, 1023u, 1023u, &code));
+    CHECK(locadex_morton3_encode_u32(1023u, 1023u, 1023u, &code));
     CHECK(code == MORTON_MAX);
     for (i = 0u; i < RANDOM_CASES; ++i) {
         x = next_random() & 1023u;
         y = next_random() & 1023u;
         z = next_random() & 1023u;
         expected = morton_reference(x, y, z);
-        CHECK(pc_morton3_encode_u32(x, y, z, &actual) && actual == expected);
-        CHECK(pc_morton3_decode_u32(expected, &decoded_x, &decoded_y, &decoded_z));
+        CHECK(locadex_morton3_encode_u32(x, y, z, &actual) && actual == expected);
+        CHECK(locadex_morton3_decode_u32(expected, &decoded_x, &decoded_y, &decoded_z));
         CHECK(decoded_x == x && decoded_y == y && decoded_z == z);
     }
     /* A second random stream exercises decode for arbitrary legal codes. */
@@ -117,24 +117,24 @@ static int test_morton(void)
         const uint32_t random_code = next_random() & MORTON_MAX;
         uint32_t rx, ry, rz;
         morton_decode_reference(random_code, &x, &y, &z);
-        CHECK(pc_morton3_decode_u32(random_code, &rx, &ry, &rz));
+        CHECK(locadex_morton3_decode_u32(random_code, &rx, &ry, &rz));
         CHECK(rx == x && ry == y && rz == z);
         CHECK(morton_reference(rx, ry, rz) == random_code);
     }
     x = 11u; y = 22u; z = 33u;
-    CHECK(!pc_morton3_decode_u32(UINT32_C(0x40000000), &x, &y, &z));
+    CHECK(!locadex_morton3_decode_u32(UINT32_C(0x40000000), &x, &y, &z));
     CHECK(x == 11u && y == 22u && z == 33u);
-    CHECK(!pc_morton3_decode_u32(UINT32_MAX, &x, &y, &z));
-    CHECK(!pc_morton3_decode_u32(0u, &x, &x, &z));
-    CHECK(!pc_morton3_decode_u32(0u, &x, &y, &x));
-    CHECK(!pc_morton3_decode_u32(0u, &x, &y, &y));
-    CHECK(!pc_morton3_decode_u32(0u, NULL, &y, &z));
+    CHECK(!locadex_morton3_decode_u32(UINT32_MAX, &x, &y, &z));
+    CHECK(!locadex_morton3_decode_u32(0u, &x, &x, &z));
+    CHECK(!locadex_morton3_decode_u32(0u, &x, &y, &x));
+    CHECK(!locadex_morton3_decode_u32(0u, &x, &y, &y));
+    CHECK(!locadex_morton3_decode_u32(0u, NULL, &y, &z));
     code = UINT32_C(0xA5A5A5A5);
-    CHECK(!pc_morton3_encode_u32(1024u, 0u, 0u, &code));
+    CHECK(!locadex_morton3_encode_u32(1024u, 0u, 0u, &code));
     CHECK(code == UINT32_C(0xA5A5A5A5));
-    CHECK(!pc_morton3_encode_u32(0u, 1024u, 0u, &code));
-    CHECK(!pc_morton3_encode_u32(0u, 0u, 1024u, &code));
-    CHECK(!pc_morton3_encode_u32(0u, 0u, 0u, NULL));
+    CHECK(!locadex_morton3_encode_u32(0u, 1024u, 0u, &code));
+    CHECK(!locadex_morton3_encode_u32(0u, 0u, 1024u, &code));
+    CHECK(!locadex_morton3_encode_u32(0u, 0u, 0u, NULL));
     return 0;
 }
 
@@ -152,24 +152,24 @@ static int test_voxel(void)
                     const uint32_t expected_x = index % w;
                     const uint32_t expected_y = (index / w) % h;
                     const uint32_t expected_z = index / (w * h);
-                    CHECK(pc_voxel_coords_3d_u32(w, h, d, index, &x, &y, &z));
+                    CHECK(locadex_voxel_coords_3d_u32(w, h, d, index, &x, &y, &z));
                     CHECK(x == expected_x && y == expected_y && z == expected_z);
-                    CHECK(pc_voxel_index_3d_u32(w, h, d, x, y, z, &encoded));
+                    CHECK(locadex_voxel_index_3d_u32(w, h, d, x, y, z, &encoded));
                     CHECK((uint64_t)encoded == voxel_reference(w, h, x, y, z));
                     CHECK(encoded == index);
                 }
             }
     /* Legal maximum representable volume (2^32 cells) and near-boundary shapes. */
-    CHECK(pc_voxel_index_3d_u32(65536u, 65536u, 1u,
+    CHECK(locadex_voxel_index_3d_u32(65536u, 65536u, 1u,
                                 65535u, 65535u, 0u, &index));
     CHECK(index == UINT32_MAX);
-    CHECK(pc_voxel_coords_3d_u32(65536u, 65536u, 1u, UINT32_MAX,
+    CHECK(locadex_voxel_coords_3d_u32(65536u, 65536u, 1u, UINT32_MAX,
                                  &x, &y, &z));
     CHECK(x == 65535u && y == 65535u && z == 0u);
-    CHECK(pc_voxel_index_3d_u32(UINT32_MAX, 1u, 1u,
+    CHECK(locadex_voxel_index_3d_u32(UINT32_MAX, 1u, 1u,
                                 UINT32_MAX - 1u, 0u, 0u, &index));
     CHECK(index == UINT32_MAX - 1u);
-    CHECK(pc_voxel_coords_3d_u32(UINT32_MAX, 1u, 1u, UINT32_MAX - 1u,
+    CHECK(locadex_voxel_coords_3d_u32(UINT32_MAX, 1u, 1u, UINT32_MAX - 1u,
                                  &x, &y, &z));
     CHECK(x == UINT32_MAX - 1u && y == 0u && z == 0u);
     for (i = 0u; i < RANDOM_CASES; ++i) {
@@ -184,9 +184,9 @@ static int test_voxel(void)
         const uint32_t rz = next_random() % d;
         const uint64_t ref = voxel_reference(w, h, rx, ry, rz);
         CHECK(volume <= VOLUME_LIMIT && ref < VOLUME_LIMIT);
-        CHECK(pc_voxel_index_3d_u32(w, h, d, rx, ry, rz, &encoded));
+        CHECK(locadex_voxel_index_3d_u32(w, h, d, rx, ry, rz, &encoded));
         CHECK((uint64_t)encoded == ref);
-        CHECK(pc_voxel_coords_3d_u32(w, h, d, encoded, &x, &y, &z));
+        CHECK(locadex_voxel_coords_3d_u32(w, h, d, encoded, &x, &y, &z));
         CHECK(x == rx && y == ry && z == rz);
     }
     /* Random inverse indices independently derived with quotient/remainder. */
@@ -197,26 +197,26 @@ static int test_voxel(void)
         const uint32_t ry = (test_index / w) % h;
         const uint32_t rz = (uint32_t)((uint64_t)test_index /
                                       ((uint64_t)w * (uint64_t)h));
-        CHECK(pc_voxel_coords_3d_u32(w, h, d, test_index, &x, &y, &z));
+        CHECK(locadex_voxel_coords_3d_u32(w, h, d, test_index, &x, &y, &z));
         CHECK(x == rx && y == ry && z == rz);
-        CHECK(pc_voxel_index_3d_u32(w, h, d, rx, ry, rz, &encoded));
+        CHECK(locadex_voxel_index_3d_u32(w, h, d, rx, ry, rz, &encoded));
         CHECK(encoded == test_index);
     }
     x = 11u; y = 22u; z = 33u; index = 99u;
-    CHECK(!pc_voxel_index_3d_u32(0u, 1u, 1u, 0u, 0u, 0u, &index));
+    CHECK(!locadex_voxel_index_3d_u32(0u, 1u, 1u, 0u, 0u, 0u, &index));
     CHECK(index == 99u);
-    CHECK(!pc_voxel_index_3d_u32(2u, 3u, 4u, 2u, 0u, 0u, &index));
-    CHECK(!pc_voxel_index_3d_u32(2u, 3u, 4u, 0u, 3u, 0u, &index));
-    CHECK(!pc_voxel_index_3d_u32(2u, 3u, 4u, 0u, 0u, 4u, &index));
-    CHECK(!pc_voxel_index_3d_u32(UINT32_MAX, 2u, 1u, 0u, 0u, 0u, &index));
-    CHECK(!pc_voxel_index_3d_u32(1u, 1u, 1u, 0u, 0u, 0u, NULL));
+    CHECK(!locadex_voxel_index_3d_u32(2u, 3u, 4u, 2u, 0u, 0u, &index));
+    CHECK(!locadex_voxel_index_3d_u32(2u, 3u, 4u, 0u, 3u, 0u, &index));
+    CHECK(!locadex_voxel_index_3d_u32(2u, 3u, 4u, 0u, 0u, 4u, &index));
+    CHECK(!locadex_voxel_index_3d_u32(UINT32_MAX, 2u, 1u, 0u, 0u, 0u, &index));
+    CHECK(!locadex_voxel_index_3d_u32(1u, 1u, 1u, 0u, 0u, 0u, NULL));
     CHECK(index == 99u);
-    CHECK(!pc_voxel_coords_3d_u32(2u, 3u, 4u, 24u, &x, &y, &z));
-    CHECK(!pc_voxel_coords_3d_u32(UINT32_MAX, 2u, 1u, 0u, &x, &y, &z));
-    CHECK(!pc_voxel_coords_3d_u32(1u, 1u, 1u, 0u, &x, &x, &z));
-    CHECK(!pc_voxel_coords_3d_u32(1u, 1u, 1u, 0u, &x, &y, &x));
-    CHECK(!pc_voxel_coords_3d_u32(1u, 1u, 1u, 0u, &x, &y, &y));
-    CHECK(!pc_voxel_coords_3d_u32(1u, 1u, 1u, 0u, NULL, &y, &z));
+    CHECK(!locadex_voxel_coords_3d_u32(2u, 3u, 4u, 24u, &x, &y, &z));
+    CHECK(!locadex_voxel_coords_3d_u32(UINT32_MAX, 2u, 1u, 0u, &x, &y, &z));
+    CHECK(!locadex_voxel_coords_3d_u32(1u, 1u, 1u, 0u, &x, &x, &z));
+    CHECK(!locadex_voxel_coords_3d_u32(1u, 1u, 1u, 0u, &x, &y, &x));
+    CHECK(!locadex_voxel_coords_3d_u32(1u, 1u, 1u, 0u, &x, &y, &y));
+    CHECK(!locadex_voxel_coords_3d_u32(1u, 1u, 1u, 0u, NULL, &y, &z));
     CHECK(x == 11u && y == 22u && z == 33u);
     return 0;
 }
@@ -231,44 +231,44 @@ static int test_direction(void)
     uint32_t n;
     uint8_t direction = 99u;
     for (i = 0u; i < 8u; ++i) {
-        CHECK(pc_grid_direction8_i32(vectors[i][0], vectors[i][1], &direction));
+        CHECK(locadex_grid_direction8_i32(vectors[i][0], vectors[i][1], &direction));
         CHECK(direction == i);
     }
-    CHECK(pc_grid_direction8_i32(INT32_MIN, INT32_MIN, &direction) && direction == 5u);
-    CHECK(pc_grid_direction8_i32(INT32_MAX, INT32_MIN, &direction) && direction == 7u);
-    CHECK(pc_grid_direction8_i32(INT32_MIN, INT32_MAX, &direction) && direction == 3u);
-    CHECK(pc_grid_direction8_i32(INT32_MAX, INT32_MAX, &direction) && direction == 1u);
+    CHECK(locadex_grid_direction8_i32(INT32_MIN, INT32_MIN, &direction) && direction == 5u);
+    CHECK(locadex_grid_direction8_i32(INT32_MAX, INT32_MIN, &direction) && direction == 7u);
+    CHECK(locadex_grid_direction8_i32(INT32_MIN, INT32_MAX, &direction) && direction == 3u);
+    CHECK(locadex_grid_direction8_i32(INT32_MAX, INT32_MAX, &direction) && direction == 1u);
     /* The irrational 22.5-degree boundary is bracketed by adjacent integer slopes. */
-    CHECK(pc_grid_direction8_i32(INT32_C(1000000000), INT32_C(414213562), &direction) && direction == 0u);
-    CHECK(pc_grid_direction8_i32(INT32_C(1000000000), INT32_C(414213563), &direction) && direction == 1u);
-    CHECK(pc_grid_direction8_i32(INT32_C(414213562), INT32_C(1000000000), &direction) && direction == 2u);
-    CHECK(pc_grid_direction8_i32(INT32_C(414213563), INT32_C(1000000000), &direction) && direction == 1u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(414213562), INT32_C(1000000000), &direction) && direction == 2u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(414213563), INT32_C(1000000000), &direction) && direction == 3u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(1000000000), INT32_C(414213562), &direction) && direction == 4u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(1000000000), INT32_C(414213563), &direction) && direction == 3u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(1000000000), -INT32_C(414213562), &direction) && direction == 4u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(1000000000), -INT32_C(414213563), &direction) && direction == 5u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(414213562), -INT32_C(1000000000), &direction) && direction == 6u);
-    CHECK(pc_grid_direction8_i32(-INT32_C(414213563), -INT32_C(1000000000), &direction) && direction == 5u);
-    CHECK(pc_grid_direction8_i32(INT32_C(414213562), -INT32_C(1000000000), &direction) && direction == 6u);
-    CHECK(pc_grid_direction8_i32(INT32_C(414213563), -INT32_C(1000000000), &direction) && direction == 7u);
-    CHECK(pc_grid_direction8_i32(INT32_C(1000000000), -INT32_C(414213562), &direction) && direction == 0u);
-    CHECK(pc_grid_direction8_i32(INT32_C(1000000000), -INT32_C(414213563), &direction) && direction == 7u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(1000000000), INT32_C(414213562), &direction) && direction == 0u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(1000000000), INT32_C(414213563), &direction) && direction == 1u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(414213562), INT32_C(1000000000), &direction) && direction == 2u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(414213563), INT32_C(1000000000), &direction) && direction == 1u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(414213562), INT32_C(1000000000), &direction) && direction == 2u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(414213563), INT32_C(1000000000), &direction) && direction == 3u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(1000000000), INT32_C(414213562), &direction) && direction == 4u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(1000000000), INT32_C(414213563), &direction) && direction == 3u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(1000000000), -INT32_C(414213562), &direction) && direction == 4u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(1000000000), -INT32_C(414213563), &direction) && direction == 5u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(414213562), -INT32_C(1000000000), &direction) && direction == 6u);
+    CHECK(locadex_grid_direction8_i32(-INT32_C(414213563), -INT32_C(1000000000), &direction) && direction == 5u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(414213562), -INT32_C(1000000000), &direction) && direction == 6u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(414213563), -INT32_C(1000000000), &direction) && direction == 7u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(1000000000), -INT32_C(414213562), &direction) && direction == 0u);
+    CHECK(locadex_grid_direction8_i32(INT32_C(1000000000), -INT32_C(414213563), &direction) && direction == 7u);
     direction = 77u;
-    CHECK(!pc_grid_direction8_i32(0, 0, &direction) && direction == 77u);
-    CHECK(!pc_grid_direction8_i32(1, 1, NULL));
+    CHECK(!locadex_grid_direction8_i32(0, 0, &direction) && direction == 77u);
+    CHECK(!locadex_grid_direction8_i32(1, 1, NULL));
     for (n = 0u; n < RANDOM_CASES; ++n) {
         const int32_t dx = as_i32(next_random());
         const int32_t dy = as_i32(next_random());
         uint8_t expected;
         if (dx == 0 && dy == 0) {
             direction = 91u;
-            CHECK(!pc_grid_direction8_i32(dx, dy, &direction) && direction == 91u);
+            CHECK(!locadex_grid_direction8_i32(dx, dy, &direction) && direction == 91u);
             continue;
         }
         expected = direction_reference(dx, dy);
-        CHECK(pc_grid_direction8_i32(dx, dy, &direction));
+        CHECK(locadex_grid_direction8_i32(dx, dy, &direction));
         CHECK(direction == expected);
     }
     return 0;

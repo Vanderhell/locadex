@@ -1,8 +1,8 @@
-#include "pc_voxel_index_3d_u32.h"
+#include <locadex/spatial/voxel_index_3d_u32.h>
 
 #include <stddef.h>
 
-bool pc_voxel_index_3d_u32(uint32_t width, uint32_t height, uint32_t depth,
+bool locadex_voxel_index_3d_u32(uint32_t width, uint32_t height, uint32_t depth,
                            uint32_t x, uint32_t y, uint32_t z,
                            uint32_t *index)
 {
